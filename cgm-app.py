@@ -12,6 +12,10 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+colors = ["#00798c", "#d1495b", '#edae49', '#66a182', '#4a4a4a',
+          '#1a508b', '#e3120b', '#c5a880', '#9F5F80', '#6F9EAF',
+          '#0278ae','#F39233', '#A7C5EB', '#54E346', '#ABCE74',
+        '#d6b0b1', '#58391c', '#cdd0cb', '#ffb396', '#6930c3']
 
 st.set_page_config(page_title='CGM App', page_icon=Image.open('files/givita-favicon.jpg'), layout="wide")
 
@@ -36,7 +40,7 @@ st.sidebar.image(logo_img, use_column_width=False, width=120)
 st.sidebar.header("Welcome!")
 
 
-c29, c30, c31 = st.columns([1, 10, 1])
+c29, c30, c31 = st.columns([1, 15, 1])
 
 with c30:
 
@@ -64,28 +68,32 @@ with c30:
 
         st.stop()
 
+# st.success(
+#     f"""
+#         💡 Tip!  shift 키를 누른 상태에서 열(row)을 클릭하면, 여러 개의 열을 선택할 수 있습니다!
+#         """
+# )
 
+# gb = GridOptionsBuilder.from_dataframe(shows)
+# # enables pivoting on all columns, however i'd need to change ag grid to allow export of pivoted/grouped data, however it select/filters groups
+# gb.configure_default_column(enablePivot=True, enableValue=True, enableRowGroup=True)
+# gb.configure_selection(selection_mode="multiple", use_checkbox=True)
+# gb.configure_side_bar()  # side_bar is clearly a typo :) should by sidebar
+# gridOptions = gb.build()
+#
+# response = AgGrid(
+#     shows,
+#     gridOptions=gridOptions,
+#     enable_enterprise_modules=True,
+#     update_mode=GridUpdateMode.MODEL_CHANGED,
+#     data_return_mode=DataReturnMode.FILTERED_AND_SORTED,
+#     fit_columns_on_grid_load=False,
+# )
 gb = GridOptionsBuilder.from_dataframe(shows)
-# enables pivoting on all columns, however i'd need to change ag grid to allow export of pivoted/grouped data, however it select/filters groups
-gb.configure_default_column(enablePivot=True, enableValue=True, enableRowGroup=True)
-gb.configure_selection(selection_mode="multiple", use_checkbox=True)
-gb.configure_side_bar()  # side_bar is clearly a typo :) should by sidebar
+gb.configure_pagination()
+gb.configure_side_bar()
 gridOptions = gb.build()
-
-st.success(
-    f"""
-        💡 Tip!  shift 키를 누른 상태에서 열(row)을 클릭하면, 여러 개의 열을 선택할 수 있습니다!
-        """
-)
-
-response = AgGrid(
-    shows,
-    gridOptions=gridOptions,
-    enable_enterprise_modules=True,
-    update_mode=GridUpdateMode.MODEL_CHANGED,
-    data_return_mode=DataReturnMode.FILTERED_AND_SORTED,
-    fit_columns_on_grid_load=False,
-)
+AgGrid(shows, gridOptions=gridOptions)
 
 # df = pd.DataFrame(response["selected_rows"])
 
@@ -97,21 +105,34 @@ st.write(f"""**- 데이터 크기** : {shows.shape}""")
 st.write(f"""**- 수집 기간** : {date_min} ~ {date_max}""")
 st.write(f"""**- 전체 차트**""")
 
-fig1 = make_subplots(rows=3, cols=1, vertical_spacing=0.08, horizontal_spacing=0.00)
-fig1.update_layout(height = 600, width = 900, margin=dict(l=0, r=0, t=10, b=0))
+# fig1 = make_subplots(rows=1, cols=1, vertical_spacing=0.08, horizontal_spacing=0.00)
+# fig1.update_layout(height=250, width=900, margin=dict(l=0, r=0, t=10, b=0))
+#
+# fig1.add_trace((go.Scatter(x=shows['timestamp'], y=shows['glucose'], name='glucose',
+#                           hovertext=shows['menu'],
+#                           hovertemplate="datetime : %{x}<br>" + "glucose : %{y}<br>" + "meal : %{hovertext}<br>",
+#                           line=dict(color = px.colors.qualitative.G10[0], width = 1.2))), row=1, col=1)
+# fig1.add_trace((go.Scatter(x=shows['timestamp'], y=shows['meal'], name='meal',
+#                            hovertext=shows['menu'],
+#                            hovertemplate="datetime : %{x}<br>" + "meal : %{hovertext}<br>",
+#                            line=dict(color = px.colors.qualitative.G10[1], width = 1.2))), row=2, col=1)
+# fig1.add_trace((go.Scatter(x=shows['timestamp'], y=shows['activity'], name='activity',
+#                            hovertext=shows['act_type'],
+#                            hovertemplate="datetime : %{x}<br>" + "activity : %{hovertext}<br>",
+#                            line=dict(color = px.colors.qualitative.G10[2],width = 1.2))), row=3, col=1)
 
-fig1.add_trace((go.Scatter(x=shows['timestamp'], y=shows['glucose'], name='glucose',
-                          hovertext=shows['menu'],
-                          hovertemplate="datetime : %{x}<br>" + "glucose : %{y}<br>" + "meal : %{hovertext}<br>",
-                          line=dict(color = px.colors.qualitative.G10[0], width = 1.2))), row=1, col=1)
-fig1.add_trace((go.Scatter(x=shows['timestamp'], y=shows['meal'], name='meal',
-                           hovertext=shows['menu'],
-                           hovertemplate="datetime : %{x}<br>" + "meal : %{hovertext}<br>",
-                           line=dict(color = px.colors.qualitative.G10[1], width = 1.2))), row=2, col=1)
-fig1.add_trace((go.Scatter(x=shows['timestamp'], y=shows['activity'], name='activity',
-                           hovertext=shows['act_type'],
-                           hovertemplate="datetime : %{x}<br>" + "activity : %{hovertext}<br>",
-                           line=dict(color = px.colors.qualitative.G10[2],width = 1.2))), row=3, col=1)
+shows_hourly = shows.set_index('timestamp').resample('H')['glucose'].mean().reset_index()
+fig1 = px.line(shows, x = 'timestamp', y ='glucose', title='glucose')
+fig1.update_traces(line = dict(color = colors[0], width = 0.8), opacity= 0.8)
+fig1.add_scatter(x = shows_hourly['timestamp'], y = shows_hourly['glucose'], mode = 'lines',
+                line = dict(color = colors[1], width = 2), opacity=0.8, showlegend=False)
+
+fig1.update_layout(showlegend=False, paper_bgcolor = 'rgba(0, 0, 0, 0)', plot_bgcolor = 'rgba(0, 0, 0, 0)',
+                   height=300, width=900, margin=dict(l=0, r=0, t=20, b=0),
+                   font_family= 'Arial', yaxis_title=None, title_x=0.5)
+fig1.update_xaxes(linewidth=1.2, linecolor='#BCCCDC', showgrid=False, showspikes=True,
+                  spikethickness=2, spikedash="dot", spikecolor="#999999", spikemode="across")
+fig1.update_yaxes(linewidth=1.2, linecolor ='#BCCCDC', showgrid=False)
 
 st.plotly_chart(fig1, use_container_width=True)
 
@@ -181,6 +202,9 @@ else:
             fig2.add_trace((go.Scatter(x=df_selected['timestamp'], y=df_selected[col], name=col, mode='lines',
                                        hovertemplate="datetime : %{x}<br>" + "%{y}<br>",
                                        line=dict(color=px.colors.qualitative.G10[i], width=1))), row=i + 1, col=1)
+
+    fig2.update_xaxes(showspikes=True, spikethickness=2, spikedash="dot",
+                      spikecolor="#999999", spikemode="across")
 
     st.plotly_chart(fig2, use_container_width=True)
 
