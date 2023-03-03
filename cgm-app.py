@@ -22,9 +22,9 @@ st.set_page_config(page_title='CGM App', page_icon=Image.open('files/givita-favi
 with open('style.css') as css:
     st.markdown(f'<style>{css.read()}</style>', unsafe_allow_html=True)
 
-@st.cache
-def get_profile_pic():
-    return Image.open('files/givita-logo.jpg')
+# @st.cache
+# def get_profile_pic():
+#     return Image.open('files/givita-logo.jpg')
 
 # @st.cache
 # def get_data(path):
@@ -33,10 +33,10 @@ def get_profile_pic():
 st.markdown("<h3 style='text-align: center; color: black;'>Simple CGM Data Analysis </h2>", unsafe_allow_html=True)
 st.markdown('-----------------------------------------------------')
 st.markdown("Welcome to Simple CGM data analysis app. \
-            For more information, please visit our [repository](https://github.com/givita-ai)!")
+            For more information, please visit our [repository](https://github.com/sguys99)!")
 
-logo_img = get_profile_pic()
-st.sidebar.image(logo_img, use_column_width=False, width=120)
+#logo_img = get_profile_pic()
+#st.sidebar.image(logo_img, use_column_width=False, width=120)
 st.sidebar.header("Welcome!")
 
 
@@ -62,7 +62,8 @@ with c30:
             #     👆 Upload a .csv file first. Sample to try: [biostats.csv](https://people.sc.fsu.edu/~jburkardt/data/csv/biostats.csv)
             #     """
             f"""
-            👆 가지고 있는 CGM 데이터(csv 포맷)를 업로드 하세요.
+            👆 가지고 있는 CGM 데이터(csv 포맷)를 업로드 하세요.\n
+            샘플 데이터로 시험하려면 [여기](https://github.com/sguys99/cgm_app/TEST-A-D-0143.csv)를 클릭하세요.
             """
         )
 
@@ -212,5 +213,5 @@ else:
   ################################## FOOTER ##################################
 
 st.markdown('-----------------------------------------------------')
-st.text('Developed by GIVITA AI part - 2022')
-st.text('Mail: help@gi-vita.io')
+st.text('Developed by Kwang Myung Yu - 2022')
+st.text('Mail: sguys99@naver.com')
