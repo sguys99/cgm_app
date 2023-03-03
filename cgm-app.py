@@ -63,7 +63,7 @@ with c30:
             #     """
             f"""
             👆 가지고 있는 CGM 데이터(csv 포맷)를 업로드 하세요.\n
-            샘플 데이터로 시험하려면 [여기](https://github.com/sguys99/cgm_app/TEST-A-D-0143.csv)를 클릭하세요.
+            샘플 데이터로 시험하려면 [여기](https://drive.google.com/file/d/18AvTn59sdPh5GqLUMEwWVs0pUNHE9Sdx/view?usp=share_link)를 클릭하세요.
             """
         )
 
